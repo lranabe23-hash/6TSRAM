@@ -1,0 +1,49 @@
+* 6T SRAM Cell - ngspice
+
+********************
+* Power Supplies
+********************
+VDD vdd 0 1.8
+VWL wl  0 PULSE(0 1.8 1n 1n 1n 20n 40n)
+
+********************
+* Bitlines
+********************
+VBL  bl  0 1.8
+VBLB blb 0 0
+
+********************
+* MOSFET Models
+********************
+.model NMOS nmos level=1 VTO=0.4 KP=120u
+.model PMOS pmos level=1 VTO=-0.4 KP=50u
+
+********************
+* Cross-coupled Inverter 1
+********************
+M1 q   qb  vdd vdd PMOS
+M2 q   qb  0   0   NMOS
+
+********************
+* Cross-coupled Inverter 2
+********************
+M3 qb  q   vdd vdd PMOS
+M4 qb  q   0   0   NMOS
+
+********************
+* Access Transistors
+********************
+M5 q   wl  bl  0   NMOS
+M6 qb  wl  blb 0   NMOS
+
+********************
+* Analysis
+********************
+.tran 0.1n 100n
+
+.control
+run
+plot v(q) v(qb) v(wl)
+.endc
+
+.end
